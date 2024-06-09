@@ -1,0 +1,42 @@
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+
+public class Main {
+    private static JFrame frame; // Ventana principal de la aplicación
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> { // Ejecuta el código en el hilo de eventos de Swing
+            frame = new JFrame(""); // Crea una nueva ventana
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Define el comportamiento al cerrar la ventana
+            frame.setSize(800, 600); // Establece el tamaño de la ventana
+            frame.setResizable(false); // Hace que la ventana no sea redimensionable
+
+            mostrarPantallaPrincipal();// Muestra la pantalla
+            frame.setVisible(true); // Hace visible la ventana
+        });
+    }
+
+    // Método para mostrar la pantalla principal
+    public static void mostrarPantallaPrincipal() {
+        frame.getContentPane().removeAll(); // Elimina todos los componentes de la ventana
+        frame.getContentPane().add(new PantallaPrincipal()); // Agrega la pantalla principal a la ventana
+        frame.revalidate(); // Valida el diseño de los componentes
+        frame.repaint(); // Vuelve a pintar la ventana
+    }
+
+    // Método para mostrar la pantalla de juego
+    public static void mostrarPantallaJuego() {
+        frame.getContentPane().removeAll(); // Elimina todos los componentes de la ventana
+        frame.getContentPane().add(new PantallaJuego()); // Agrega la pantalla de juego a la ventana
+        frame.revalidate(); // Valida el diseño de los componentes
+        frame.repaint(); // Vuelve a pintar la ventana
+    }
+
+    // Método para mostrar la pantalla de derrota
+    public static void mostrarPantallaDerrota() {
+        frame.getContentPane().removeAll(); // Elimina todos los componentes de la ventana
+        frame.getContentPane().add(new PantallaDerrota()); // Agrega la pantalla de derrota a la ventana
+        frame.revalidate(); // Valida el diseño de los componentes
+        frame.repaint(); // Vuelve a pintar la ventana
+    }
+}
