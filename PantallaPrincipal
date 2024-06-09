@@ -11,6 +11,8 @@ import java.awt.Font;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 // Clase que define la pantalla principal del juego
 public class PantallaPrincipal extends JPanel {
@@ -69,6 +71,12 @@ public class PantallaPrincipal extends JPanel {
         botonInicio.setFocusPainted(false); // Desactiva la pintura del foco
         botonInicio.setAlignmentX(Component.CENTER_ALIGNMENT); // Alinea el botón al centro horizontalmente
         botonInicio.setMaximumSize(new Dimension(200, 50)); // Establece el tamaño máximo del botón
+        botonInicio.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Main.mostrarPantallaJuego(); // Transición a PantallaJuego
+            }
+        });
 
         panelInferior.add(Box.createVerticalGlue()); // Añade un espacio vertical
         panelInferior.add(botonInicio); // Añade el botón de inicio
