@@ -1,0 +1,28 @@
+import javax.swing.JPanel;
+import javax.swing.BoxLayout;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+// Clase que define la pantalla de juego
+public class PantallaJuego extends JPanel {
+    // Constructor
+    public PantallaJuego() {
+        setLayout(new BorderLayout()); // Establece el diseño de la pantalla
+
+        JPanel contenedor = new JPanel(); // Crea un panel para contener los elementos del juego
+        contenedor.setLayout(new BoxLayout(contenedor, BoxLayout.Y_AXIS)); // Establece un diseño vertical para el contenedor
+
+        contenedor.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                Main.mostrarPantallaDerrota();
+            }
+        });
+
+        contenedor.setBackground(Color.WHITE); // Establece el color de fondo del contenedor
+
+        add(contenedor, BorderLayout.CENTER); // Añade el contenedor al centro de la pantalla
+    }
+}
