@@ -1,0 +1,80 @@
+import javax.swing.JPanel;
+import javax.swing.JLabel;
+import javax.swing.JButton;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+// Clase para la pantalla de derrota
+public class PantallaDerrota extends JPanel {
+    private static final Font FUENTE_TITULO = new Font("Gotham", Font.PLAIN, 50);
+    private static final Font FUENTE_BOTON = new Font("Inter", Font.PLAIN, 24);
+
+    // Constructor
+    /**
+     * 
+     */
+    public PantallaDerrota() {
+        setLayout(new BorderLayout());
+        setBackground(Color.RED); // Color de fondo temporal para distinguir la pantalla
+
+        JPanel panelCentral = new JPanel();
+        panelCentral.setLayout(new BoxLayout(panelCentral, BoxLayout.Y_AXIS));
+        panelCentral.setBackground(Color.RED);
+
+        JLabel titulo = new JLabel("Has Perdido");
+        titulo.setFont(FUENTE_TITULO);
+        titulo.setForeground(Color.BLACK);
+        titulo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panelCentral.add(Box.createVerticalGlue());
+        panelCentral.add(titulo);
+        panelCentral.add(Box.createVerticalGlue());
+
+        JPanel panelInferior = new JPanel();
+        panelInferior.setBackground(Color.RED);
+        panelInferior.setPreferredSize(new Dimension(getWidth(), 100));
+        panelInferior.setLayout(new BoxLayout(panelInferior, BoxLayout.X_AXIS));
+
+        JButton botonReintentar = new JButton("Reintentar");
+        botonReintentar.setFont(FUENTE_BOTON);
+        botonReintentar.setBackground(Color.WHITE);
+        botonReintentar.setForeground(Color.BLACK);
+        botonReintentar.setFocusPainted(false);
+        botonReintentar.setAlignmentX(Component.CENTER_ALIGNMENT);
+        botonReintentar.setMaximumSize(new Dimension(200, 50));
+        botonReintentar.addActionListener((ActionEvent e) -> {
+            //metodo para mostrar pantalla de juego
+            Main.mostrarPantallaJuego();
+        });
+
+        JButton botonMenu = new JButton("Menú Principal");
+        botonMenu.setFont(FUENTE_BOTON);
+        botonMenu.setBackground(Color.WHITE);
+        botonMenu.setForeground(Color.BLACK);
+        botonMenu.setFocusPainted(false);
+        botonMenu.setAlignmentX(Component.CENTER_ALIGNMENT);
+        botonMenu.setMaximumSize(new Dimension(200, 50));
+        botonMenu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //metodo para mostrar pantalla principal
+                Main.mostrarPantallaPrincipal();
+            }
+        });
+
+        panelInferior.add(Box.createHorizontalGlue());
+        panelInferior.add(botonReintentar);
+        panelInferior.add(Box.createRigidArea(new Dimension(20, 0)));
+        panelInferior.add(botonMenu);
+        panelInferior.add(Box.createHorizontalGlue());
+
+        add(panelCentral, BorderLayout.CENTER);
+        add(panelInferior, BorderLayout.SOUTH);
+    }
+}
