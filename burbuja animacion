@@ -1,0 +1,66 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
+
+
+public class BurbujasAnimacion extends JPanel implements ActionListener {
+    private Image[] sprites;
+    private int spriteCabeza = 0;
+    private Timer tiempo;
+
+    public BurbujasAnimacion() {
+        cargarSprites();
+        tiempo = new Timer(45, this); 
+        tiempo.start();
+    }   //Milisegundos para cambio de sprite
+
+    private void cargarSprites() {
+        String[] spritePaths = {
+            "res\\burb1.png",
+            "res\\burb2.png",
+            "res\\burb3.png",
+            "res\\burb4.png",
+            "res\\burb5.png ",
+            "res\\burb6.png",
+            "res\\burb7.png",
+            "res\\burb8.png",
+            "res\\Transparencia.png"
+        };
+        sprites = new Image[spritePaths.length];
+
+        for (int i = 0; i < spritePaths.length; i++) {
+            try {
+                sprites[i] = ImageIO.read(new File(spritePaths[i]));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }   
+
+    @Override
+    protected void paintComponent(Graphics graficos) {
+        super.paintComponent(graficos);
+        if (sprites[spriteCabeza] != null) {
+            graficos.drawImage(sprites[spriteCabeza], 100, 150, this); 
+        }
+    }   //Posicion de la burbuja en el JFrame
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        spriteCabeza = (spriteCabeza + 1) % sprites.length;
+        repaint();
+    }   //Cambio de sprite
+
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Animacion burbuja");
+        BurbujasAnimacion panel = new BurbujasAnimacion();
+        frame.add(panel);
+        frame.setSize(400, 400);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+    }
+}
