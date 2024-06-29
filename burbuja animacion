@@ -2,21 +2,40 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter; 
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
-
 
 public class BurbujasAnimacion extends JPanel implements ActionListener {
     private Image[] sprites;
     private int spriteCabeza = 0;
     private Timer tiempo;
+    private boolean isAnimationActive = false;
 
     public BurbujasAnimacion() {
         cargarSprites();
-        tiempo = new Timer(45, this); 
-        tiempo.start();
-    }   //Milisegundos para cambio de sprite
+        tiempo = new Timer(45, this);
+    
+        tiempo.stop();
+        /*se detiene el tiempo de la animación en el primer sprite hasta dar click en él*/
+
+        
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent event) {
+                if (event.getButton() == MouseEvent.BUTTON1) {
+                    Point mousePos = event.getPoint();
+                    if (isWithinImage(mousePos)) {
+                        isAnimationActive = true;
+                        tiempo.start();
+                    }
+                }
+            }
+            /*click para dar inicio a la animación reventar*/
+        });
+    }
 
     private void cargarSprites() {
         String[] spritePaths = {
@@ -24,7 +43,7 @@ public class BurbujasAnimacion extends JPanel implements ActionListener {
             "res\\burb2.png",
             "res\\burb3.png",
             "res\\burb4.png",
-            "res\\burb5.png ",
+            "res\\burb5.png",
             "res\\burb6.png",
             "res\\burb7.png",
             "res\\burb8.png",
@@ -39,26 +58,53 @@ public class BurbujasAnimacion extends JPanel implements ActionListener {
                 e.printStackTrace();
             }
         }
-    }   
+    }
+
+    private boolean isWithinImage(Point mousePos) {
+        int imageWidth = sprites[0].getWidth(this);
+        int imageHeight = sprites[0].getHeight(this);
+        int mouseX = mousePos.x;
+        int mouseY = mousePos.y;
+        return mouseX >= 0 && mouseX < imageWidth && mouseY >= 0 && mouseY < imageHeight;
+    }
 
     @Override
     protected void paintComponent(Graphics graficos) {
         super.paintComponent(graficos);
-        if (sprites[spriteCabeza] != null) {
-            graficos.drawImage(sprites[spriteCabeza], 100, 150, this); 
+        if (isAnimationActive && spriteCabeza < sprites.length) {
+            graficos.drawImage(sprites[spriteCabeza], 0, 0, this);
+        } else {
+            graficos.drawImage(sprites[0], 100, 200, this);
         }
-    }   //Posicion de la burbuja en el JFrame
+        /*Posicion de la burbuja en el JFrame */
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        spriteCabeza = (spriteCabeza + 1) % sprites.length;
-        repaint();
-    }   //Cambio de sprite
+        if (isAnimationActive) {
+            if (spriteCabeza < sprites.length - 1) {
+                spriteCabeza++;
+            }
+            if (spriteCabeza >= sprites.length) {
+                isAnimationActive = false;
+                tiempo.stop();            }
+            repaint();
+        /*Cambio de sprite */
+        }
+        if (spriteCabeza < sprites.length - 1) {
+            spriteCabeza++;
+            repaint();
+        } else {
+            tiempo.stop();
+        }
+    }
+
+    
 
     public static void main(String[] args) {
-        JFrame frame = new JFrame("Animacion burbuja");
-        BurbujasAnimacion panel = new BurbujasAnimacion();
-        frame.add(panel);
+        JFrame frame = new JFrame("Burbujas Animacion");
+        BurbujasAnimacion animacion = new BurbujasAnimacion();
+        frame.add(animacion);
         frame.setSize(400, 400);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
