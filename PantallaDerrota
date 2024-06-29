@@ -1,3 +1,6 @@
+package vista;
+
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JButton;
@@ -8,73 +11,84 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-// Clase para la pantalla de derrota
-public class PantallaDerrota extends JPanel {
-    private static final Font FUENTE_TITULO = new Font("Gotham", Font.PLAIN, 50);
-    private static final Font FUENTE_BOTON = new Font("Inter", Font.PLAIN, 24);
+// Clase que define la pantalla de derrota
+public class PantallaDerrota {
+    private JFrame frame;
+    private JButton botonReintentar;
+    private JButton botonSalir;
 
-    // Constructor
-    /**
-     * 
-     */
     public PantallaDerrota() {
-        setLayout(new BorderLayout());
-        setBackground(Color.RED); // Color de fondo temporal para distinguir la pantalla
+        // Crear el frame
+        frame = new JFrame("Pantalla de Derrota");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(800, 600);
+        frame.setLocationRelativeTo(null);
 
+        // Crear panel principal
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+        panel.setBackground(Color.WHITE); // Cambio de color a blanco
+
+        // Panel central para el título
         JPanel panelCentral = new JPanel();
         panelCentral.setLayout(new BoxLayout(panelCentral, BoxLayout.Y_AXIS));
-        panelCentral.setBackground(Color.RED);
+        panelCentral.setBackground(Color.WHITE); // Mismo color blanco
 
-        JLabel titulo = new JLabel("Has Perdido");
-        titulo.setFont(FUENTE_TITULO);
-        titulo.setForeground(Color.BLACK);
+        JLabel titulo = new JLabel("Oh no!");
+        titulo.setFont(new Font("Gotham", Font.PLAIN, 80));
+        titulo.setForeground(Color.BLACK); // Cambio de color del texto a negro
         titulo.setAlignmentX(Component.CENTER_ALIGNMENT);
         panelCentral.add(Box.createVerticalGlue());
         panelCentral.add(titulo);
         panelCentral.add(Box.createVerticalGlue());
 
+        // Panel inferior para los botones
         JPanel panelInferior = new JPanel();
-        panelInferior.setBackground(Color.RED);
-        panelInferior.setPreferredSize(new Dimension(getWidth(), 100));
+        panelInferior.setBackground(new Color(106, 215, 222));
+        panelInferior.setPreferredSize(new Dimension(frame.getWidth(), 250));
         panelInferior.setLayout(new BoxLayout(panelInferior, BoxLayout.X_AXIS));
 
-        JButton botonReintentar = new JButton("Reintentar");
-        botonReintentar.setFont(FUENTE_BOTON);
+        botonReintentar = new JButton("Volver a intentarlo");
+        botonReintentar.setFont(new Font("Arial", Font.PLAIN, 24));
         botonReintentar.setBackground(Color.WHITE);
         botonReintentar.setForeground(Color.BLACK);
         botonReintentar.setFocusPainted(false);
         botonReintentar.setAlignmentX(Component.CENTER_ALIGNMENT);
-        botonReintentar.setMaximumSize(new Dimension(200, 50));
-        botonReintentar.addActionListener((ActionEvent e) -> {
-            //metodo para mostrar pantalla de juego
-            Main.mostrarPantallaJuego();
-        });
+        botonReintentar.setMaximumSize(new Dimension(300, 50));
 
-        JButton botonMenu = new JButton("Menú Principal");
-        botonMenu.setFont(FUENTE_BOTON);
-        botonMenu.setBackground(Color.WHITE);
-        botonMenu.setForeground(Color.BLACK);
-        botonMenu.setFocusPainted(false);
-        botonMenu.setAlignmentX(Component.CENTER_ALIGNMENT);
-        botonMenu.setMaximumSize(new Dimension(200, 50));
-        botonMenu.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //metodo para mostrar pantalla principal
-                Main.mostrarPantallaPrincipal();
-            }
-        });
+        botonSalir = new JButton("Salir");
+        botonSalir.setFont(new Font("Arial", Font.PLAIN, 24));
+        botonSalir.setBackground(Color.WHITE);
+        botonSalir.setForeground(Color.BLACK);
+        botonSalir.setFocusPainted(false);
+        botonSalir.setAlignmentX(Component.CENTER_ALIGNMENT);
+        botonSalir.setMaximumSize(new Dimension(200, 50));
 
         panelInferior.add(Box.createHorizontalGlue());
         panelInferior.add(botonReintentar);
         panelInferior.add(Box.createRigidArea(new Dimension(20, 0)));
-        panelInferior.add(botonMenu);
+        panelInferior.add(botonSalir);
         panelInferior.add(Box.createHorizontalGlue());
 
-        add(panelCentral, BorderLayout.CENTER);
-        add(panelInferior, BorderLayout.SOUTH);
+        // Agregar paneles al panel principal
+        panel.add(panelCentral, BorderLayout.CENTER);
+        panel.add(panelInferior, BorderLayout.SOUTH);
+
+        // Agregar panel al frame
+        frame.add(panel);
+        frame.setVisible(true);
+    }
+
+    public JFrame getFrame() {
+        return frame;
+    }
+
+    public JButton getBotonReintentar() {
+        return botonReintentar;
+    }
+
+    public JButton getBotonSalir() {
+        return botonSalir;
     }
 }
