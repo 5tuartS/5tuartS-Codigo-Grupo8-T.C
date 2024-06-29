@@ -1,28 +1,45 @@
+package vista;
+
+import java.awt.Color;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.BoxLayout;
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import controlador.ControladorPantallaJuego;
 
-// Clase que define la pantalla de juego
-public class PantallaJuego extends JPanel {
-    // Constructor
+public class PantallaJuego {
+    private JFrame frame;
+    private ControladorPantallaJuego controlador;
+
     public PantallaJuego() {
-        setLayout(new BorderLayout()); // Establece el diseño de la pantalla
+        // Crear el frame
+        frame = new JFrame("Pantalla de Juego");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(800, 600);
+        frame.setLocationRelativeTo(null);
 
-        JPanel contenedor = new JPanel(); // Crea un panel para contener los elementos del juego
-        contenedor.setLayout(new BoxLayout(contenedor, BoxLayout.Y_AXIS)); // Establece un diseño vertical para el contenedor
+        // Crear panel principal
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
 
-        contenedor.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                Main.mostrarPantallaDerrota();
-            }
-        });
+        // Crear panel contenedor
+        JPanel contenedor = new JPanel();
+        contenedor.setLayout(new BoxLayout(contenedor, BoxLayout.Y_AXIS));
+        contenedor.setBackground(Color.WHITE);
 
-        contenedor.setBackground(Color.WHITE); // Establece el color de fondo del contenedor
+        // Crear y agregar controlador al contenedor
+        controlador = new ControladorPantallaJuego(frame); // Pasa 'frame' como referencia
+        contenedor.add(controlador); // Agrega el controlador al contenedor
 
-        add(contenedor, BorderLayout.CENTER); // Añade el contenedor al centro de la pantalla
+        // Agregar contenedor al panel principal
+        panel.add(contenedor, BorderLayout.CENTER);
+
+        // Agregar panel al frame
+        frame.add(panel);
+        frame.setVisible(true);
+    }
+
+    public JFrame getFrame() {
+        return frame;
     }
 }
