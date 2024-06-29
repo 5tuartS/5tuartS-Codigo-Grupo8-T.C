@@ -1,3 +1,6 @@
+package vista;
+
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JButton;
@@ -11,78 +14,89 @@ import java.awt.Font;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-// Clase que define la pantalla principal del juego
-public class PantallaPrincipal extends JPanel {
-    // Fuentes utilizadas en la pantalla
-    private static final Font FUENTE_TITULO = new Font("Gotham", Font.PLAIN, 80);
-    private static final Font FUENTE_BOTON = new Font("Inter", Font.PLAIN, 24);
+public class PantallaPrincipal {
+    private JFrame frame;           // Ventana principal
+    private JButton botonInicio;    // Botón de inicio
+    private Image backgroundImage;  // Imagen de fondo
 
-    private Image backgroundImage; // Imagen de fondo
-
-    // Constructor
     public PantallaPrincipal() {
-        setLayout(new BorderLayout()); // Establece el diseño de la pantalla
-        setBackground(Color.WHITE); // Establece el color de fondo
+        // Crear el frame
+        frame = new JFrame("Pantalla Principal");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  // Cierra la aplicación al cerrar la ventana
+        frame.setSize(800, 600);    // Tamaño inicial de la ventana
+        frame.setLocationRelativeTo(null);  // Centra la ventana en la pantalla
+
+        // Crear panel principal
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());  // Diseño del panel principal
+        panel.setBackground(Color.WHITE);     // Color de fondo del panel principal
 
         // Cargar la imagen de fondo
         try {
-            backgroundImage = new ImageIcon("C:\\Users\\ameli\\Downloads\\Captura de pantalla 2024-06-06 172443.jpg")
-                    .getImage();
-
+            backgroundImage = new ImageIcon("src\\Imagen\\Burbuja.jpg").getImage();
         } catch (Exception e) {
             System.out.println("ERROR al cargar la imagen de fondo");
         }
 
-        // Panel central
+        // Panel central para el título y la imagen de fondo
         JPanel panelCentral = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 // Dibuja la imagen de fondo
-                int x = getWidth() - backgroundImage.getWidth(this) + 30;
-                int y = -80;
+                int x = getWidth() - backgroundImage.getWidth(this) + 40;
+                int y = -30;
                 g.drawImage(backgroundImage, x, y, this);
             }
         };
-        panelCentral.setLayout(new BoxLayout(panelCentral, BoxLayout.Y_AXIS)); // Establece un diseño vertical
-        panelCentral.setOpaque(false); // Hace que el panel sea transparente
+        panelCentral.setLayout(new BoxLayout(panelCentral, BoxLayout.Y_AXIS));  // Diseño vertical
+        panelCentral.setOpaque(false);  // Hace el panel transparente sobre la imagen de fondo
 
-        JLabel titulo = new JLabel("Surver"); // Etiqueta del título
-        titulo.setFont(FUENTE_TITULO); // Establece la fuente del título
-        titulo.setForeground(Color.BLACK); // Establece el color del título
-        titulo.setAlignmentX(Component.CENTER_ALIGNMENT); // Alinea el título al centro horizontalmente
-        panelCentral.add(Box.createVerticalGlue()); // Añade un espacio vertical
-        panelCentral.add(titulo); // Añade el título
-        panelCentral.add(Box.createVerticalGlue()); // Añade otro espacio vertical
+        // Etiqueta del título
+        JLabel titulo = new JLabel("Surver");
+        titulo.setFont(new Font("Gotham", Font.PLAIN, 80));  // Fuente y tamaño del título
+        titulo.setForeground(Color.BLACK);  // Color del texto del título
+        titulo.setAlignmentX(Component.CENTER_ALIGNMENT);  // Alineación del título al centro horizontal
+        panelCentral.add(Box.createVerticalGlue());  // Espacio vertical
+        panelCentral.add(titulo);  // Añade el título
+        panelCentral.add(Box.createVerticalGlue());  // Espacio vertical
 
-        // Panel inferior
+        // Panel inferior para el botón de inicio
         JPanel panelInferior = new JPanel();
-        panelInferior.setBackground(new Color(106, 215, 222)); // Establece el color de fondo
-        panelInferior.setPreferredSize(new Dimension(getWidth(), 100)); // Establece la altura del panel
-        panelInferior.setLayout(new BoxLayout(panelInferior, BoxLayout.Y_AXIS)); // Establece un diseño vertical
+        panelInferior.setBackground(new Color(106, 215, 222));  // Color de fondo del panel inferior
+        panelInferior.setPreferredSize(new Dimension(frame.getWidth(), 100));  // Tamaño del panel inferior
+        panelInferior.setLayout(new BoxLayout(panelInferior, BoxLayout.Y_AXIS));  // Diseño vertical
 
-        JButton botonInicio = new JButton("Iniciar"); // Botón de inicio
-        botonInicio.setFont(FUENTE_BOTON); // Establece la fuente del botón
-        botonInicio.setBackground(Color.WHITE); // Establece el color de fondo del botón
-        botonInicio.setForeground(Color.BLACK); // Establece el color del texto del botón
-        botonInicio.setFocusPainted(false); // Desactiva la pintura del foco
-        botonInicio.setAlignmentX(Component.CENTER_ALIGNMENT); // Alinea el botón al centro horizontalmente
-        botonInicio.setMaximumSize(new Dimension(200, 50)); // Establece el tamaño máximo del botón
-        botonInicio.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Main.mostrarPantallaJuego(); // Transición a PantallaJuego
-            }
-        });
+        // Botón de inicio
+        botonInicio = new JButton("Iniciar");
+        botonInicio.setFont(new Font("Inter", Font.PLAIN, 24));  // Fuente y tamaño del botón
+        botonInicio.setBackground(Color.WHITE);  // Color de fondo del botón
+        botonInicio.setForeground(Color.BLACK);  // Color del texto del botón
+        botonInicio.setFocusPainted(false);  // Desactiva la pintura del foco
+        botonInicio.setAlignmentX(Component.CENTER_ALIGNMENT);  // Alineación del botón al centro horizontal
+        botonInicio.setMaximumSize(new Dimension(200, 50));  // Tamaño máximo del botón
 
-        panelInferior.add(Box.createVerticalGlue()); // Añade un espacio vertical
-        panelInferior.add(botonInicio); // Añade el botón de inicio
-        panelInferior.add(Box.createVerticalGlue()); // Añade otro espacio vertical
+        panelInferior.add(Box.createVerticalGlue());  // Espacio vertical
+        panelInferior.add(botonInicio);  // Añade el botón de inicio
+        panelInferior.add(Box.createVerticalGlue());  // Espacio vertical
 
-        add(panelCentral, BorderLayout.CENTER); // Añade el panel central al centro de la pantalla
-        add(panelInferior, BorderLayout.SOUTH); // Añade el panel inferior al sur de la pantalla
+        // Agregar paneles al panel principal
+        panel.add(panelCentral, BorderLayout.CENTER);  // Panel central al centro del panel principal
+        panel.add(panelInferior, BorderLayout.SOUTH);  // Panel inferior al sur del panel principal
+
+        // Agregar panel al frame
+        frame.add(panel);  // Añade el panel principal al frame
+        frame.setVisible(true);  // Hace visible la ventana
+    }
+
+    // Método getter para el botón de inicio
+    public JButton getBotonInicio() {
+        return botonInicio;
+    }
+
+    // Método getter para la ventana principal
+    public JFrame getFrame() {
+        return frame;
     }
 }
