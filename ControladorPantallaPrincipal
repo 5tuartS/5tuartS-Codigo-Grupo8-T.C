@@ -1,0 +1,30 @@
+package controlador;
+
+import vista.PantallaPrincipal;
+import vista.PantallaJuego;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class ControladorPantallaPrincipal {
+    private PantallaPrincipal vista;
+
+    public ControladorPantallaPrincipal(PantallaPrincipal vista) {
+        this.vista = vista;
+        initControlador();
+    }
+
+    private void initControlador() {
+        vista.getBotonInicio().addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Cerrar la ventana PantallaPrincipal
+                vista.getFrame().dispose();
+
+                // Mostrar la ventana PantallaJuego
+                PantallaJuego pantallaJuego = new PantallaJuego();
+                pantallaJuego.getFrame().setVisible(true);
+            }
+        });
+    }
+}
