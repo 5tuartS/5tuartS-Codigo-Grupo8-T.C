@@ -1,0 +1,34 @@
+package controlador;
+
+import vista.PantallaDerrota;
+import vista.PantallaJuego;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class ControladorPantallaDerrota {
+    private PantallaDerrota pantallaDerrota;
+
+    public ControladorPantallaDerrota(PantallaDerrota pantallaDerrota) {
+        this.pantallaDerrota = pantallaDerrota;
+
+        pantallaDerrota.getBotonReintentar().addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Cerrar la ventana PantallaPrincipal
+                pantallaDerrota.getFrame().dispose();
+
+                // Mostrar la ventana PantallaJuego
+                PantallaJuego pantallaJuego = new PantallaJuego();
+                pantallaJuego.getFrame().setVisible(true);
+            }
+        });
+
+        pantallaDerrota.getBotonSalir().addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+
+        });
+    }
+}
