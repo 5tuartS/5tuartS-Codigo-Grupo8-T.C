@@ -1,0 +1,12 @@
+package controlador;
+
+import vista.PantallaPrincipal;
+
+public class MainControlador {
+
+    public static void main(String[] args) {
+        // Instanciar y controlar la vista de PantallaPrincipal
+        PantallaPrincipal pantallaPrincipal = new PantallaPrincipal();
+        new ControladorPantallaPrincipal(pantallaPrincipal);
+    }
+}
