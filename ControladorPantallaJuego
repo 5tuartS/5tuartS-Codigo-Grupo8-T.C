@@ -1,0 +1,374 @@
+package controlador;
+
+import vista.PantallaDerrota;
+
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import javax.imageio.ImageIO;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.Timer;
+
+// Panel que controla la pantalla de juego y las burbujas
+public class ControladorPantallaJuego extends JPanel {
+    private List<Burbuja> burbujas; // Lista de burbujas en el juego
+    private JFrame frame; // Marco principal del juego
+    private Timer burbujaGeneratorTimer; // Temporizador para generar burbujas automáticamente
+    private int burbujaGeneracionIntervalo = 2000; // Intervalo inicial para generar nuevas burbujas
+    private int velocidadMaxima = 2; // Velocidad máxima alcanzada por las burbujas
+
+    // Constructor del controlador de la pantalla de juego
+    public ControladorPantallaJuego(JFrame frame) {
+        this.frame = frame;
+        burbujas = new ArrayList<>();
+        cargarBurbujas(5); // Crear 5 burbujas al inicio
+
+        // Iniciar el movimiento de las burbujas
+        iniciarMovimientoBurbujas();
+        iniciarGeneracionBurbujas(); // Iniciar la generación automática de burbujas
+
+        // Agregar listener para clics en las burbujas
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent evt) {
+                Point clickPoint = evt.getPoint();
+                Burbuja burbujaClickeada = buscarBurbujaPorPunto(clickPoint);
+                if (burbujaClickeada != null) {
+                    burbujaClickeada.startAnimation(); // Iniciar animación al hacer clic en la burbuja
+                    incrementarVelocidad(); // Incrementar la velocidad al reventar una burbuja
+                } else {
+                    detenerAnimaciones(); // Detener todas las animaciones
+
+                    // Mostrar pantalla de derrota
+                    PantallaDerrota pantallaDerrota = new PantallaDerrota();
+                    pantallaDerrota.getFrame().setVisible(true);
+
+                    // Configurar el controlador de la pantalla de derrota
+                    ControladorPantallaDerrota controladorPantallaDerrota = new ControladorPantallaDerrota(
+                            pantallaDerrota);
+
+                    // Cerrar la pantalla de juego actual
+                    frame.dispose();
+                }
+            }
+        });
+
+        // Configurar WindowListener para manejar el cierre de la ventana
+        configurarWindowListener();
+    }
+
+    // Configurar el WindowListener para el cierre de la ventana principal
+    private void configurarWindowListener() {
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                detenerAnimaciones(); // Detener todas las animaciones al cerrar la ventana
+                if (burbujaGeneratorTimer != null) {
+                    burbujaGeneratorTimer.stop(); // Detener el temporizador de generación de burbujas
+                }
+            }
+        });
+    }
+
+    // Detener todas las animaciones activas de las burbujas
+    private void detenerAnimaciones() {
+        for (Burbuja burbuja : burbujas) {
+            burbuja.detenerAnimacion(); // Detener la animación de cada burbuja
+        }
+    }
+
+    // Cargar burbujas iniciales al juego
+    private void cargarBurbujas(int cantidad) {
+        // Lista de estados y transiciones para la máquina de estados
+        List<Estado> estados = new ArrayList<>();
+        Estado inicial = new Estado("inicio", false);
+        Estado finalState = new Estado("final", true);
+        estados.add(inicial);
+        estados.add(finalState);
+
+        List<Transicion> transiciones = new ArrayList<>();
+        transiciones.add(new Transicion(inicial, finalState, "click"));
+
+        // Crear una NFA (Autómata Finito No Determinista) para cada burbuja
+        NFA nfa = new NFA(estados, transiciones, inicial);
+
+        // Crear burbujas y agregarlas a la lista
+        for (int i = 0; i < cantidad; i++) {
+            Burbuja burbuja = new Burbuja(nfa);
+            burbujas.add(burbuja);
+        }
+    }
+
+    // Método para dibujar las burbujas en el panel
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        for (Burbuja burbuja : burbujas) {
+            burbuja.paint(g); // Dibujar cada burbuja en el panel
+        }
+    }
+
+    // Iniciar el movimiento de las burbujas
+    private void iniciarMovimientoBurbujas() {
+        for (Burbuja burbuja : burbujas) {
+            burbuja.iniciarMovimiento(); // Iniciar el movimiento de cada burbuja
+        }
+    }
+
+    // Iniciar la generación automática de burbujas con un temporizador
+    private void iniciarGeneracionBurbujas() {
+        burbujaGeneratorTimer = new Timer(burbujaGeneracionIntervalo, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Crear una nueva burbuja y agregarla a la lista
+                Burbuja nuevaBurbuja = new Burbuja(
+                        new NFA(new ArrayList<>(), new ArrayList<>(), new Estado("inicio", false)));
+                burbujas.add(nuevaBurbuja);
+                nuevaBurbuja.iniciarMovimiento(); // Iniciar el movimiento de la nueva burbuja
+                repaint(); // Volver a pintar el panel
+            }
+        });
+        burbujaGeneratorTimer.start(); // Iniciar el temporizador de generación de burbujas
+    }
+
+    // Incrementar la velocidad de todas las burbujas al reventar una
+    private void incrementarVelocidad() {
+        velocidadMaxima += 5; // Incrementar el valor máximo de la velocidad
+        for (Burbuja burbuja : burbujas) {
+            burbuja.incrementarVelocidad(velocidadMaxima); // Incrementar la velocidad de cada burbuja
+        }
+    }
+
+    // Buscar una burbuja por las coordenadas de un punto dado
+    private Burbuja buscarBurbujaPorPunto(Point point) {
+        for (Burbuja burbuja : burbujas) {
+            if (burbuja.contienePunto(point)) {
+                return burbuja; // Devolver la burbuja si el punto está dentro de ella
+            }
+        }
+        return null; // Devolver null si no se encontró ninguna burbuja en el punto
+    }
+
+    // Clase interna para representar una burbuja en el juego
+    private class Burbuja {
+        private Image[] sprites; // Sprites para la animación de la burbuja
+        private int x, y; // Posición de la burbuja en el panel
+        private int velocidadX = 2, velocidadY = 2; // Velocidad de la burbuja en los ejes X e Y
+        private int spriteCabeza = 0; // Índice del sprite actual para la animación
+        private Timer tiempo; // Temporizador para el movimiento de la burbuja
+        private boolean isAnimationActive = false; // Estado de la animación de la burbuja
+        private NFA nfa; // Autómata finito no determinista asociado a la burbuja
+
+        // Constructor de la burbuja
+        public Burbuja(NFA nfa) {
+            cargarSprites(); // Cargar los sprites desde los archivos de imagen
+            this.nfa = nfa;
+
+            // Inicializar la posición aleatoria de la burbuja dentro del panel
+            x = (int) (Math.random() * (800 - sprites[0].getWidth(ControladorPantallaJuego.this)));
+            y = (int) (Math.random() * (600 - sprites[0].getHeight(ControladorPantallaJuego.this)));
+        }
+
+        // Cargar los sprites de la burbuja desde archivos de imagen
+        private void cargarSprites() {
+            String[] spritePaths = {
+                    "src/Imagen/burb1.png",
+                    "src/Imagen/burb2.png",
+                    "src/Imagen/burb3.png",
+                    "src/Imagen/burb4.png",
+                    "src/Imagen/burb5.png",
+                    "src/Imagen/burb6.png",
+                    "src/Imagen/burb7.png",
+                    "src/Imagen/burb8.png",
+                    "src/Imagen/Transparencia.png"
+            };
+            sprites = new Image[spritePaths.length];
+
+            for (int i = 0; i < spritePaths.length; i++) {
+                try {
+                    sprites[i] = ImageIO.read(new File(spritePaths[i])); // Leer cada imagen y cargarla como sprite
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    e.printStackTrace(); // Manejar error de lectura de imagen
+                }
+            }
+        }
+
+        // Iniciar el movimiento de la burbuja con un temporizador
+        public void iniciarMovimiento() {
+            tiempo = new Timer(30, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    mover(); // Método para mover la burbuja
+                    repaint(); // Volver a dibujar la burbuja en el panel
+                }
+            });
+            tiempo.start(); // Iniciar el temporizador de movimiento
+        }
+
+        // Método para mover la burbuja
+        public void mover() {
+            // Mover la burbuja según la velocidad en los ejes X e Y
+            x += velocidadX;
+            y += velocidadY;
+
+            // Rebotar en los bordes del panel
+            if (x < 0 || x > getWidth() - sprites[0].getWidth(ControladorPantallaJuego.this)) {
+                velocidadX = -velocidadX; // Cambiar dirección en el eje X al llegar al borde
+            }
+            if (y < 0 || y > getHeight() - sprites[0].getHeight(ControladorPantallaJuego.this)) {
+                velocidadY = -velocidadY; // Cambiar dirección en el eje Y al llegar al borde
+            }
+        }
+
+        // Incrementar la velocidad de la burbuja al reventarla
+        public void incrementarVelocidad(int nuevaVelocidad) {
+            velocidadX = nuevaVelocidad; // Cambiar velocidad en el eje X
+            velocidadY = nuevaVelocidad; // Cambiar velocidad en el eje Y
+        }
+
+        // Iniciar la animación de la burbuja al hacer clic en ella
+        public void startAnimation() {
+            nfa.procesarSimbolo("click"); // Procesar el símbolo "click" en el autómata asociado
+            if (nfa.esEstadoFinal()) {
+                // Realizar alguna acción específica si está en un estado final del autómata
+            }
+
+            if (!isAnimationActive) {
+                isAnimationActive = true; // Marcar la animación como activa
+                spriteCabeza = 0; // Reiniciar la secuencia de sprites
+                Timer animationTimer = new Timer(30, new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        if (spriteCabeza < sprites.length - 1) {
+                            spriteCabeza++; // Avanzar al siguiente sprite
+                            repaint(); // Volver a dibujar la burbuja con el nuevo sprite
+                        } else {
+                            isAnimationActive = false; // Marcar la animación como finalizada
+                            ((Timer) e.getSource()).stop(); // Detener el temporizador de animación
+                        }
+                    }
+                });
+                animationTimer.setInitialDelay(0); // Establecer un retraso inicial de la animación
+                animationTimer.start(); // Iniciar el temporizador de animación
+            }
+        }
+
+        // Detener la animación de la burbuja
+        public void detenerAnimacion() {
+            if (tiempo != null && tiempo.isRunning()) {
+                tiempo.stop(); // Detener el temporizador de movimiento
+                isAnimationActive = false; // Marcar la animación como finalizada
+            }
+        }
+
+        // Método para dibujar la burbuja en el panel
+        public void paint(Graphics g) {
+            g.drawImage(sprites[spriteCabeza], x, y, ControladorPantallaJuego.this); // Dibujar el sprite actual de la
+                                                                                     // burbuja
+        }
+
+        // Verificar si la burbuja contiene un punto dado por sus coordenadas
+        public boolean contienePunto(Point point) {
+            return x <= point.x && point.x <= x + sprites[0].getWidth(ControladorPantallaJuego.this) &&
+                    y <= point.y && point.y <= y + sprites[0].getHeight(ControladorPantallaJuego.this);
+        }
+    }
+
+    // Clase interna para representar un estado en un autómata finito
+    private class Estado {
+        private String nombre; // Nombre del estado
+        private boolean esFinal; // Indicador de si es un estado final
+
+        // Constructor del estado
+        public Estado(String nombre, boolean esFinal) {
+            this.nombre = nombre; // Asignar nombre
+            this.esFinal = esFinal; // Asignar estado final o no
+        }
+
+        // Obtener el nombre del estado
+        public String getNombre() {
+            return nombre;
+        }
+
+        // Verificar si es un estado final
+        public boolean esFinal() {
+            return esFinal;
+        }
+    }
+
+    // Clase interna para representar una transición entre estados en un autómata
+    // finito
+    private class Transicion {
+        private Estado origen; // Estado de origen de la transición
+        private Estado destino; // Estado de destino de la transición
+        private String simbolo; // Símbolo que activa la transición
+
+        // Constructor de la transición
+        public Transicion(Estado origen, Estado destino, String simbolo) {
+            this.origen = origen; // Asignar estado de origen
+            this.destino = destino; // Asignar estado de destino
+            this.simbolo = simbolo; // Asignar símbolo de la transición
+        }
+
+        // Obtener el estado de origen
+        public Estado getOrigen() {
+            return origen;
+        }
+
+        // Obtener el estado de destino
+        public Estado getDestino() {
+            return destino;
+        }
+
+        // Obtener el símbolo de la transición
+        public String getSimbolo() {
+            return simbolo;
+        }
+    }
+
+    // Clase interna para representar un autómata finito no determinista (NFA)
+    private class NFA {
+        private List<Estado> estados; // Lista de estados del NFA
+        private List<Transicion> transiciones; // Lista de transiciones del NFA
+        private Estado estadoActual; // Estado actual del NFA
+
+        // Constructor del NFA
+        public NFA(List<Estado> estados, List<Transicion> transiciones, Estado estadoInicial) {
+            this.estados = estados; // Asignar lista de estados
+            this.transiciones = transiciones; // Asignar lista de transiciones
+            this.estadoActual = estadoInicial; // Asignar estado inicial
+        }
+
+        // Procesar un símbolo en el NFA para cambiar de estado
+        public void procesarSimbolo(String simbolo) {
+            for (Transicion transicion : transiciones) {
+                if (transicion.getOrigen().equals(estadoActual) && transicion.getSimbolo().equals(simbolo)) {
+                    estadoActual = transicion.getDestino(); // Cambiar al estado de destino de la transición
+                    break;
+                }
+            }
+        }
+
+        // Verificar si el estado actual del NFA es un estado final
+        public boolean esEstadoFinal() {
+            return estadoActual.esFinal(); // Devolver true si el estado actual es final
+        }
+
+        // Obtener el estado actual del NFA
+        public Estado getEstadoActual() {
+            return estadoActual; // Devolver el estado actual del NFA
+        }
+    }
+}
